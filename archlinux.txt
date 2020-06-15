@@ -1,0 +1,71 @@
+a#ArchLinux BIOS mode 2019+ installation
+#root mode
+#format partitions with cfdisk (/mnt and swap)
+timedatectl set-ntp true
+mkfs.ext4 /dev/sdXX
+mkswap /dev/sdaX
+swapon /dev/sdaX
+mount /dev/sdaX /mnt
+pacstrap /mnt base linux linux-firmware
+genfstab -U /mnt >> /mnt/etc/fstab
+arch-chroot /mnt
+ln -sf /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
+hwclock --systohc
+locale-gen
+pacman -S nano
+nano /etc/locale.gen
+unlock language
+save and exit
+echo LANG=pl_PL.UTF-8 >> /etc/locale.conf
+export LANG=pl_PL.UTF-8
+nano /etc/vconsole.conf
+to file:
+KEYMAP=pl
+FONT=Lat2-Terminus16.psfu.gz
+FONT_MAP=8859-2
+save and exit
+echo <hostname> >> /etc/hostname
+nano /etc/hosts
+to file:
+127.0.0.1	localhost
+::1		localhost
+127.0.1.1	<hostname>.localdomain <hostname>
+save and exit
+nano /etc/pacman.conf
+to file:
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+save and exit
+pacman -Syu xf86-video-amdgpu mesa xf86-input-synaptics xf86-video-intel
+pacman -S xorg-server xf86-input-evdev xf86-video-vesa xorg-apps
+pacman -S firefox (or pacman -S firefox-esr)
+pacman -S plasma plasma-meta plasma-desktop plasma-pa
+pacman -S sddm
+systemctl enable sddm
+pacman -S alsa-firmware alsa-lib alsa-plugins alsa-utils pulseaudio pulseaudio-alsa libcanberra libcanberra-pulse
+mkinitcpio -P
+passwd
+useradd -m -g users -G wheel,storage,power -s /bin/sh <username>
+passwd <username>
+pacman -S sudo
+visudo
+to file:
+root ALL=(ALL) ALL
+<usermame> ALL=(ALL) ALL
+pacman -S grub
+grub-install  --recheck /dev/sda
+pacman -S os-prober
+grub-mkconfig -o /boot/grub/grub.cfg
+pacman -S xterm
+pacman -S konsole
+pacman -S konqueror
+pacman -S net-tools
+pacman -S udev
+pacman -S dhcpcd
+pacman -S base-devel
+exit
+unmount -a
+reboot
+
+internet: http://www.freebsd.org/doc/handbook/network-wireless.html
+xorg drivers: http://www.archlinux.org/groups/x86_64/xorg-drivers/
